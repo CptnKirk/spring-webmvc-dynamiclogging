@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         version="2.4"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>Basic Spring MVC app with Logback enhancements</display-name>
+    <description>A basic project cut down featuring logback dynamic logging</description>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath*:applicationContext-base.xml
+        </param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>
+                classpath*:applicationContext-webmvc.xml
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>MDCCleanupServletFilter</filter-name>
+        <filter-class>org.samurai.logging.v10.MDCCleanupServletFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>MDCUserInsertingServletFilter</filter-name>
+        <filter-class>org.samurai.logging.v10.MDCUserInsertingServletFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>MDCCleanupServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>MDCUserInsertingServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--
+    As part of a standard project I like to have a bit more control over the rendering of my errors.
+    This isn't related to logging, and you can cut this section out and be fine.  Check the common.error package
+    to see what's going on here.
+
+    Note: This puts a nice face on top of the Validation errors that you'll get if you mess up a param to one of the logging APIs.
+     -->
+    <error-page>
+        <exception-type>javax.validation.ValidationException</exception-type>
+        <location>/errors/validationFailed</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/errors/404</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/errors/500</location>
+    </error-page>
+
+</web-app>
